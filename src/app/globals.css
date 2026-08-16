@@ -1,0 +1,1892 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Special+Elite&display=swap');
+
+body {
+  background-color: #0a0a0f;
+  color: #e8e0d4;
+}
+
+@layer base {
+  * {
+    border-color: #2a2a3a;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-border rounded-lg p-6;
+  }
+
+  .card-hover {
+    @apply bg-surface border border-border rounded-lg p-6 transition-all duration-200 hover:border-primary hover:shadow-lg hover:shadow-primary/20;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-white hover:bg-primary-hover active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-surface-light text-white border border-border hover:border-primary active:scale-95;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-danger text-white hover:bg-red-600 active:scale-95;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 bg-surface-light border border-border rounded-lg text-white placeholder-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-full;
+  }
+
+  .badge-primary {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-primary/20 text-primary;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-success/20 text-success;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-warning/20 text-warning;
+  }
+
+  .badge-danger {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-danger/20 text-danger;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PHASMOPHOBIA BOOK THEME
+   ═══════════════════════════════════════════ */
+
+:root {
+  --book-paper: #f5e6c8;
+  --book-paper-dark: #e8d5b0;
+  --book-paper-edge: #d4c4a0;
+  --book-ink: #2c1810;
+  --book-ink-dim: #5a4030;
+  --book-ink-faint: #8a7060;
+  --book-red: #c0392b;
+  --book-red-dim: #922b21;
+  --book-blue: #1a3a5c;
+  --book-accent: #8b6914;
+  --book-spine: #3a2a1a;
+  --book-cover: #1a1208;
+  --book-tab-bg: #e8d5b0;
+  --book-tab-active: #f5e6c8;
+  --book-shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════
+   GAME DIARY THEME — scoped to .book-desk
+   ═══════════════════════════════════════════ */
+
+.book-desk {
+  --book-ink: #1a1a1a;
+  --book-ink-dim: #4a4a4a;
+  --book-ink-faint: #7a7a7a;
+  padding: 1.5rem;
+  gap: 0;
+}
+
+.book {
+  background:
+    linear-gradient(135deg, rgba(30, 25, 18, 0.92) 0%, rgba(18, 14, 8, 0.95) 100%),
+    url('/diary.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+}
+
+.book-page,
+.book-result {
+  --book-ink: #1a1a1a;
+  --book-ink-dim: #4a4a4a;
+  --book-ink-faint: #7a7a7a;
+}
+
+.book-page-title {
+  font-size: 1.1rem;
+}
+
+.book-page-subtitle {
+  font-size: 0.8rem;
+}
+
+.rules-heading {
+  font-size: 0.85rem;
+}
+
+/* ── Loading ── */
+
+.journal-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0f;
+}
+
+.journal-loading-content {
+  text-align: center;
+}
+
+.journal-loading-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.journal-loading-text {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1.25rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+}
+
+.journal-loading-error {
+  margin-top: 1.5rem;
+  color: var(--book-red);
+}
+
+/* ── Error Toast ── */
+
+.journal-error-toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: var(--book-paper);
+  border: 1px solid var(--book-red);
+  color: var(--book-red);
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-family: 'Crimson Text', Georgia, serif;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* ── Journal Container ── */
+
+.journal-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0f;
+}
+
+.journal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: var(--book-cover);
+  border-bottom: 1px solid var(--book-spine);
+}
+
+.journal-title {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 1.25rem;
+  color: var(--book-paper);
+  letter-spacing: 0.05em;
+}
+
+.journal-room-code {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.875rem;
+  color: var(--book-paper-edge);
+  letter-spacing: 0.1em;
+}
+
+.journal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* ── Physical Book Container ── */
+
+.book-desk {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(40, 25, 15, 0.9) 0%, rgba(10, 8, 5, 1) 70%),
+    #0a0805;
+  padding: 0;
+  overflow: hidden;
+}
+
+.book {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 900px;
+  filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.5));
+}
+
+.book-full {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Page Tabs (stick out from top of book) ── */
+
+.book-tabs {
+  display: flex;
+  gap: 2px;
+  padding-left: 2rem;
+  margin-bottom: -2px;
+  z-index: 10;
+}
+
+.book-tab {
+  padding: 0.5rem 1.25rem;
+  background: var(--book-tab-bg);
+  color: var(--book-ink-dim);
+  border: 1px solid var(--book-paper-edge);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  top: 1px;
+}
+
+.book-tab:hover {
+  background: var(--book-paper);
+  color: var(--book-ink);
+}
+
+.book-tab-active {
+  background: var(--book-paper);
+  color: var(--book-ink);
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--book-paper);
+}
+
+/* ── Book Body (two-page spread) ── */
+
+.book-body {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  background: var(--book-cover);
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ── Navigation Arrows ── */
+
+.book-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 2.5rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 230, 200, 0.08);
+  color: var(--book-paper-edge);
+  border: 1px solid rgba(245, 230, 200, 0.15);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-arrow:hover {
+  background: rgba(245, 230, 200, 0.15);
+  color: var(--book-paper);
+  border-color: rgba(245, 230, 200, 0.3);
+}
+
+.book-arrow-left {
+  left: -0.5rem;
+}
+
+.book-arrow-right {
+  right: -0.5rem;
+}
+
+/* ── Two-Page Spread ── */
+
+.book-spread {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ── Individual Page ── */
+
+.book-page {
+  flex: 1;
+  padding: 1.75rem 2rem;
+  overflow-y: auto;
+  min-height: 0;
+  background:
+    linear-gradient(135deg, var(--book-paper) 0%, var(--book-paper-dark) 100%);
+  position: relative;
+}
+
+.book-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(180, 160, 130, 0.15) 28px,
+      rgba(180, 160, 130, 0.15) 29px
+    );
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.book-page-left {
+  border-right: none;
+  border-radius: 0;
+}
+
+.book-page-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.08), transparent);
+  pointer-events: none;
+}
+
+.book-page-right {
+  border-left: none;
+  border-radius: 0;
+}
+
+.book-page-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(180, 160, 130, 0.15) 28px,
+      rgba(180, 160, 130, 0.15) 29px
+    );
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.book-page-right::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  pointer-events: none;
+}
+
+/* ── Book Spine ── */
+
+.book-spine {
+  width: 8px;
+  background:
+    linear-gradient(to right,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.05) 30%,
+      rgba(0, 0, 0, 0.05) 70%,
+      rgba(0, 0, 0, 0.15)
+    );
+  position: relative;
+  flex-shrink: 0;
+}
+
+.book-spine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* ── Blank Right Page ── */
+
+.book-blank-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--book-ink-faint);
+}
+
+.book-page-number {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-faint);
+  position: absolute;
+  bottom: 1rem;
+  right: 1.5rem;
+}
+
+/* ── Page Content Typography ── */
+
+.book-page-title {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 1.5rem;
+  color: var(--book-ink);
+  margin: 0 0 0.25rem 0;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.book-page-subtitle {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  margin: 0 0 0.75rem 0;
+}
+
+.book-divider {
+  height: 2px;
+  background: linear-gradient(to right, var(--book-ink), var(--book-ink-faint), transparent);
+  margin: 0.75rem 0;
+  opacity: 0.4;
+}
+
+.book-divider-thin {
+  height: 1px;
+  background: var(--book-paper-edge);
+  margin: 0.5rem 0;
+  opacity: 0.5;
+}
+
+/* ── Annotations / Callouts ── */
+
+.book-annotation {
+  background: rgba(139, 105, 20, 0.1);
+  border-left: 3px solid var(--book-accent);
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.book-annotation-danger {
+  background: rgba(192, 57, 43, 0.08);
+  border-left-color: var(--book-red);
+}
+
+.book-annotation-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--book-ink);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.book-annotation-value {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--book-ink);
+  display: block;
+}
+
+.book-annotation-hint {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+/* ── Empty State ── */
+
+.book-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--book-ink-faint);
+  font-family: 'Crimson Text', Georgia, serif;
+}
+
+.book-empty p {
+  margin: 0.25rem 0;
+}
+
+.book-empty-hint {
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* ── Buttons (book style) ── */
+
+.book-btn {
+  padding: 0.5rem 1.25rem;
+  background: var(--book-blue);
+  color: var(--book-paper);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-btn:hover:not(:disabled) {
+  background: #245080;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.book-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.book-btn-danger {
+  padding: 0.5rem 1.25rem;
+  background: var(--book-red);
+  color: var(--book-paper);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-btn-danger:hover:not(:disabled) {
+  background: #d44637;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.book-btn-danger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Input (book style) ── */
+
+.book-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--book-paper-edge);
+  border-radius: 3px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--book-ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.book-input::placeholder {
+  color: var(--book-ink-faint);
+  font-style: italic;
+}
+
+.book-input:focus {
+  border-color: var(--book-blue);
+  box-shadow: 0 0 0 1px rgba(26, 58, 92, 0.2);
+}
+
+/* ── Overlay / Transition Screens ── */
+
+.book-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 8, 5, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.book-overlay-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.book-overlay-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.book-overlay-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--book-paper-edge);
+  margin-bottom: 0.5rem;
+}
+
+.book-overlay-title {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 1.75rem;
+  color: var(--book-paper);
+  letter-spacing: 0.05em;
+  margin: 0 0 0.75rem 0;
+}
+
+.book-overlay-title-danger {
+  color: var(--book-red);
+}
+
+.book-overlay-text {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1rem;
+  color: var(--book-paper-edge);
+  margin: 0.25rem 0;
+}
+
+.book-overlay-text-muted {
+  color: var(--book-ink-faint);
+  font-style: italic;
+}
+
+.book-overlay-hint {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* ── Turn Alert Toast ── */
+
+.turn-alert-toast {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  background: var(--book-cover);
+  border: 2px solid var(--book-red);
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  animation: slideDown 0.3s ease-out;
+}
+
+.turn-alert-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.turn-alert-toast-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.turn-alert-toast-voting {
+  border-color: var(--book-blue);
+}
+
+.turn-alert-toast-voting .turn-alert-toast-label {
+  color: var(--book-blue);
+}
+
+.turn-alert-toast-icon {
+  font-size: 1.5rem;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.turn-alert-toast-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--book-red);
+  font-weight: 700;
+}
+
+.turn-alert-toast-text {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--book-paper);
+}
+
+/* ═══════════════════════════════════════════
+   CLUES PAGE
+   ═══════════════════════════════════════════ */
+
+.clues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.clues-list-compact {
+  gap: 0.5rem;
+}
+
+.clue-entry {
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  position: relative;
+}
+
+.clue-entry-ejected {
+  background: rgba(192, 57, 43, 0.06);
+  border-color: rgba(192, 57, 43, 0.15);
+}
+
+.clue-entry-compact {
+  padding: 0.4rem 0.75rem;
+}
+
+.clue-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.clue-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--book-blue);
+  color: var(--book-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.clue-avatar-large {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1rem;
+}
+
+.clue-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.clue-player-name {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--book-ink);
+}
+
+.clue-order {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.7rem;
+  color: var(--book-ink-faint);
+}
+
+.clue-text {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1rem;
+  color: var(--book-ink);
+  font-style: italic;
+  line-height: 1.4;
+  padding-left: 2.25rem;
+}
+
+.clue-turn-box {
+  background: rgba(26, 58, 92, 0.06);
+  border: 1px solid rgba(26, 58, 92, 0.2);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.clue-turn-box-alert {
+  background: rgba(26, 58, 92, 0.1);
+  border-color: var(--book-blue);
+  box-shadow: 0 0 0 1px rgba(26, 58, 92, 0.2);
+  animation: turnPulse 1.6s ease-in-out infinite;
+}
+
+.clue-turn-box-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--book-red);
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+}
+
+.clue-turn-box-hint {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.clue-turn-box-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.clue-turn-status {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+/* ═══════════════════════════════════════════
+   WORD POOL PAGE
+   ═══════════════════════════════════════════ */
+
+.wordpool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.wordpool-grid-compact {
+  gap: 0.35rem;
+}
+
+.wordpool-card {
+  position: relative;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--book-ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wordpool-card:hover:not(:disabled):not(.wordpool-card-eliminated):not(.wordpool-card-readonly) {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--book-blue);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wordpool-card:disabled {
+  cursor: not-allowed;
+}
+
+.wordpool-card-eliminated {
+  background: rgba(192, 57, 43, 0.06);
+  border-color: rgba(192, 57, 43, 0.15);
+  color: var(--book-ink-faint);
+  text-decoration: line-through;
+}
+
+.wordpool-card-eliminated .wordpool-card-text {
+  opacity: 0.5;
+}
+
+.wordpool-card-readonly {
+  cursor: default;
+}
+
+.wordpool-card-selected {
+  background: rgba(26, 58, 92, 0.12);
+  border-color: var(--book-blue);
+  box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.2);
+}
+
+.wordpool-card-correct {
+  background: rgba(39, 174, 96, 0.12) !important;
+  border-color: #27ae60 !important;
+  color: #1a7a40;
+}
+
+.wordpool-card-wrong {
+  background: rgba(192, 57, 43, 0.12) !important;
+  border-color: var(--book-red) !important;
+  color: var(--book-red-dim);
+}
+
+.wordpool-card-text {
+  position: relative;
+  z-index: 1;
+}
+
+.wordpool-card-x {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.7rem;
+  color: var(--book-red);
+  opacity: 0.6;
+}
+
+.wordpool-card-badge {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Special Elite', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.wordpool-card-badge-correct {
+  background: #27ae60;
+  color: white;
+}
+
+.wordpool-card-badge-wrong {
+  background: var(--book-red);
+  color: white;
+}
+
+.wordpool-confirm {
+  margin-top: 0.75rem;
+}
+
+.wordpool-confirm-label {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--book-ink);
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+.wordpool-result {
+  margin-top: 0.75rem;
+}
+
+.wordpool-result-answer {
+  text-align: center;
+  padding: 1rem;
+}
+
+.wordpool-result-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--book-ink-faint);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.wordpool-result-value {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--book-ink);
+  display: block;
+}
+
+/* ═══════════════════════════════════════════
+   CHAT / DISCUSSION PAGE
+   ═══════════════════════════════════════════ */
+
+.chat-clue-box {
+  background: rgba(26, 58, 92, 0.06);
+  border: 1px solid rgba(26, 58, 92, 0.15);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.chat-clue-box-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--book-blue);
+  margin-bottom: 0.25rem;
+}
+
+.chat-clue-box-hint {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.chat-clue-box-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.chat-clue-status {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+.chat-clue-status-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--book-ink-faint);
+  margin-right: 0.5rem;
+}
+
+.chat-phase-banner {
+  background: rgba(139, 105, 20, 0.08);
+  border: 1px solid rgba(139, 105, 20, 0.15);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+}
+
+.chat-phase-banner-danger {
+  background: rgba(192, 57, 43, 0.06);
+  border-color: rgba(192, 57, 43, 0.15);
+}
+
+.chat-phase-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--book-ink-faint);
+  margin-right: 0.5rem;
+}
+
+.chat-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chat-messages-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.chat-msg {
+  padding: 0.4rem 0;
+}
+
+.chat-msg-system {
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.chat-msg-system-text {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.75rem;
+  color: var(--book-ink-faint);
+  font-style: italic;
+}
+
+.chat-msg-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.15rem;
+}
+
+.chat-msg-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--book-blue);
+  color: var(--book-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chat-msg-name {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--book-ink);
+}
+
+.chat-msg-time {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.65rem;
+  color: var(--book-ink-faint);
+}
+
+.chat-msg-body {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--book-ink-dim);
+  padding-left: 1.65rem;
+  line-height: 1.4;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  margin-top: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════
+   VOTING PANEL
+   ═══════════════════════════════════════════ */
+
+.voting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vote-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.vote-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: var(--book-blue);
+}
+
+.vote-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.vote-btn-selected {
+  background: rgba(26, 58, 92, 0.1) !important;
+  border-color: var(--book-blue) !important;
+  box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.15);
+}
+
+.vote-btn-skip {
+  border-style: dashed;
+  opacity: 0.9;
+}
+
+.vote-btn-skip.vote-btn-selected {
+  border-style: solid;
+}
+
+.vote-btn-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.vote-btn-name {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--book-ink);
+}
+
+.vote-btn-count {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.7rem;
+  color: var(--book-ink-faint);
+}
+
+/* ═══════════════════════════════════════════
+   VOTE RESULT PAGE
+   ═══════════════════════════════════════════ */
+
+.vote-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vote-result-entry {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+}
+
+.vote-result-entry-ejected {
+  background: rgba(192, 57, 43, 0.06);
+  border-color: rgba(192, 57, 43, 0.15);
+}
+
+.vote-result-entry-compact {
+  padding: 0.35rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vote-result-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vote-result-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--book-blue);
+  color: var(--book-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.vote-result-name {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--book-ink);
+  flex: 1;
+}
+
+.vote-result-count {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.75rem;
+  color: var(--book-ink-dim);
+}
+
+.vote-result-voters {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.75rem;
+  color: var(--book-ink-faint);
+  font-style: italic;
+  padding-left: 2rem;
+  margin-top: 0.2rem;
+}
+
+.vote-result-arrow {
+  color: var(--book-ink-faint);
+  font-size: 0.8rem;
+}
+
+.vote-result-target {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+}
+
+/* ═══════════════════════════════════════════
+   GAME RESULT PAGE
+   ═══════════════════════════════════════════ */
+
+.book-result {
+  padding: 2rem;
+  background:
+    linear-gradient(135deg, var(--book-paper) 0%, var(--book-paper-dark) 100%);
+  overflow-y: auto;
+  position: relative;
+  flex: 1;
+}
+
+.book-result::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(180, 160, 130, 0.15) 28px,
+      rgba(180, 160, 130, 0.15) 29px
+    );
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.book-result-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.book-result-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.book-result-title {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 1.75rem;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem 0;
+  position: relative;
+}
+
+.book-result-title-success {
+  color: #27ae60;
+}
+
+.book-result-title-danger {
+  color: var(--book-red);
+}
+
+.book-result-subtitle {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--book-ink-dim);
+  font-style: italic;
+  margin: 0;
+  position: relative;
+}
+
+.book-result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.book-result-error {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-red);
+  position: relative;
+}
+
+.book-result-section {
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.book-result-answer {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--book-ink);
+  text-align: center;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.book-result-category {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-faint);
+  text-align: center;
+  margin: 0;
+  position: relative;
+}
+
+.book-result-chameleon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 0.75rem 0;
+  position: relative;
+}
+
+.book-result-chameleon-name {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--book-ink);
+}
+
+.book-result-guess {
+  text-align: center;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.book-result-guess-label {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-faint);
+  margin-right: 0.5rem;
+}
+
+.book-result-guess-value {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--book-ink);
+}
+
+.book-result-guess-wrong {
+  color: var(--book-red);
+  text-decoration: line-through;
+}
+
+.book-result-guess-verdict {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  background: var(--book-red);
+  color: white;
+}
+
+.book-result-guess-correct {
+  background: #27ae60;
+}
+
+/* ═══════════════════════════════════════════
+   RULES PAGE
+   ═══════════════════════════════════════════ */
+
+.rules-section {
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.rules-heading {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--book-ink);
+  letter-spacing: 0.03em;
+  margin: 0 0 0.35rem 0;
+  text-transform: uppercase;
+}
+
+.rules-text {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--book-ink-dim);
+  line-height: 1.5;
+  margin: 0.25rem 0;
+}
+
+.rules-list {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.8rem;
+  color: var(--book-ink-dim);
+  line-height: 1.6;
+  margin: 0.25rem 0;
+  padding-left: 1.25rem;
+}
+
+.rules-list li {
+  margin-bottom: 0.15rem;
+}
+
+.rules-list-bullet {
+  list-style-type: disc;
+}
+
+/* ── Host Controls (rules page) ── */
+
+.host-controls {
+  margin-top: 0.75rem;
+}
+
+.host-controls-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.host-btn {
+  flex: 1;
+  font-size: 0.7rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--book-paper-dark);
+  color: var(--book-ink-dim);
+  border: 1px solid var(--book-paper-edge);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Special Elite', monospace;
+}
+
+.host-btn:hover {
+  background: var(--book-paper);
+  color: var(--book-ink);
+}
+
+.host-controls-status {
+  margin-top: 0.4rem;
+  font-size: 0.65rem;
+  color: var(--book-ink-faint);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════
+   ROOM CODE DISPLAY
+   ═══════════════════════════════════════════ */
+
+.room-code-display {
+  font-family: 'Special Elite', monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.15em;
+  color: var(--book-paper);
+  background: var(--book-cover);
+  border: 1px solid var(--book-spine);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  display: inline-block;
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes turnPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(26, 58, 92, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.35);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   WORD DEDUCTION BOARD (notebook)
+   ═══════════════════════════════════════════ */
+
+.word-evidence-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.word-evidence-board-readonly {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.word-evidence-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0.6rem 0.4rem;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  font-family: 'Special Elite', 'Crimson Text', Georgia, serif;
+  font-size: 0.9rem;
+  color: var(--book-ink);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.word-evidence-card:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.word-evidence-card:disabled {
+  cursor: default;
+}
+
+.word-evidence-mark {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.word-evidence-ellipse {
+  fill: none;
+  stroke: var(--book-blue);
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: evidenceDraw 0.35s ease-out forwards;
+  opacity: 0.85;
+}
+
+.word-evidence-strike {
+  fill: none;
+  stroke: var(--book-red);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: evidenceDraw 0.3s ease-out forwards;
+}
+
+@keyframes evidenceDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.word-evidence-text {
+  position: relative;
+  z-index: 1;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.word-evidence-card-POSSIBLE .word-evidence-text {
+  color: var(--book-blue);
+}
+
+.word-evidence-card-ELIMINATED .word-evidence-text {
+  opacity: 0.4;
+  color: var(--book-ink-faint);
+}
+
+.wordpool-guess-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.wordpool-guess-option {
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--book-ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.wordpool-guess-option:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--book-blue);
+}
+
+.wordpool-guess-option-selected {
+  background: rgba(26, 58, 92, 0.14);
+  border-color: var(--book-blue);
+  box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.2);
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════
+   DISMISSABLE YOUR TURN BOX
+   ═══════════════════════════════════════════ */
+
+.chat-clue-box-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.clue-box-dismiss {
+  background: none;
+  border: none;
+  padding: 0 0 0 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--book-ink-faint);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.clue-box-dismiss:hover {
+  color: var(--book-red);
+}
+
+.clue-box-reopen {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--book-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.clue-box-reopen:hover {
+  color: var(--book-ink);
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .book-desk {
+    padding: 0.75rem;
+  }
+
+  .book-tabs {
+    padding-left: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .book-tab {
+    font-size: 0.65rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .book-spread {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .book-page {
+    min-height: 0;
+    padding: 1.25rem 1rem;
+  }
+
+  .book-page-right {
+    display: none;
+  }
+
+  .book-spine {
+    display: none;
+  }
+
+  .book-arrow {
+    display: none;
+  }
+
+  .book-body {
+    flex-direction: column;
+  }
+}
