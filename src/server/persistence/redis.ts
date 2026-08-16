@@ -2,6 +2,7 @@ import Redis from "ioredis";
 import {
   REDIS_HOST,
   REDIS_PORT,
+  REDIS_URL,
   SESSION_TTL_SECONDS,
   ROOM_TTL_SECONDS,
 } from "@shared/constants";
@@ -11,15 +12,25 @@ let redis: Redis | null = null;
 
 export function getRedis(): Redis {
   if (!redis) {
-    redis = new Redis({
-      host: REDIS_HOST,
-      port: REDIS_PORT,
-      retryStrategy(times) {
-        if (times > 10) return null;
-        return Math.min(100 * Math.pow(2, times - 1), 30000);
-      },
-      maxRetriesPerRequest: 3,
-    });
+    if (REDIS_URL) {
+      redis = new Redis(REDIS_URL, {
+        retryStrategy(times) {
+          if (times > 10) return null;
+          return Math.min(100 * Math.pow(2, times - 1), 30000);
+        },
+        maxRetriesPerRequest: 3,
+      });
+    } else {
+      redis = new Redis({
+        host: REDIS_HOST,
+        port: REDIS_PORT,
+        retryStrategy(times) {
+          if (times > 10) return null;
+          return Math.min(100 * Math.pow(2, times - 1), 30000);
+        },
+        maxRetriesPerRequest: 3,
+      });
+    }
 
     redis.on("error", (err) => {
       console.error("Redis error:", err.message);

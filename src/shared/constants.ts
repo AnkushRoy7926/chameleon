@@ -9,6 +9,7 @@ export const ROOM_TTL_SECONDS = 3600;
 
 export const REDIS_HOST = process.env.REDIS_HOST || "localhost";
 export const REDIS_PORT = parseInt(process.env.REDIS_PORT || "6379");
+export const REDIS_URL = process.env.REDIS_URL || "";
 
 export const CHAMELEON_PLAYER_NAMES = [
   "Primordial Origin Immortal Venerable",
