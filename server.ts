@@ -18,7 +18,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, {}, SocketData
   httpServer,
   {
     cors: {
-      origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      origin: process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
       methods: ["GET", "POST"],
     },
     connectionStateRecovery: {

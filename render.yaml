@@ -8,7 +8,7 @@ services:
     envVars:
       - key: WS_PORT
         value: 3001
-      - key: NEXT_PUBLIC_APP_URL
+      - key: APP_URL
         sync: false
       - key: REDIS_URL
         sync: false
