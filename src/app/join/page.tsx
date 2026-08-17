@@ -21,16 +21,28 @@ export default function JoinRoomPage() {
 
     try {
       const socket = getSocket();
-      socket.connect();
 
-      socket.emit("join_room", { roomCode: roomCode.toUpperCase() }, (result) => {
-        if (result.success) {
-          router.push(`/room/${roomCode.toUpperCase()}`);
-        } else {
-          setError(result.error || "Failed to join room");
+      const doEmit = () => {
+        socket.emit("join_room", { roomCode: roomCode.toUpperCase() }, (result) => {
+          if (result.success) {
+            router.push(`/room/${roomCode.toUpperCase()}`);
+          } else {
+            setError(result.error || "Failed to join room");
+            setIsJoining(false);
+          }
+        });
+      };
+
+      if (socket.connected) {
+        doEmit();
+      } else {
+        socket.once("connect", doEmit);
+        socket.once("connect_error", (err) => {
+          setError("Failed to connect to server: " + err.message);
           setIsJoining(false);
-        }
-      });
+        });
+        socket.connect();
+      }
     } catch (err) {
       setError("Failed to connect to server");
       setIsJoining(false);

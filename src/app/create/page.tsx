@@ -43,20 +43,32 @@ export default function CreateRoomPage() {
 
     try {
       const socket = getSocket();
-      socket.connect();
 
-      socket.emit(
-        "create_room",
-        { gameId: selectedGame },
-        (result) => {
-          if (result.success && result.roomCode) {
-            router.push(`/room/${result.roomCode}`);
-          } else {
-            setError(result.error || "Failed to create room");
-            setIsCreating(false);
+      const doEmit = () => {
+        socket.emit(
+          "create_room",
+          { gameId: selectedGame },
+          (result) => {
+            if (result.success && result.roomCode) {
+              router.push(`/room/${result.roomCode}`);
+            } else {
+              setError(result.error || "Failed to create room");
+              setIsCreating(false);
+            }
           }
-        }
-      );
+        );
+      };
+
+      if (socket.connected) {
+        doEmit();
+      } else {
+        socket.once("connect", doEmit);
+        socket.once("connect_error", (err) => {
+          setError("Failed to connect to server: " + err.message);
+          setIsCreating(false);
+        });
+        socket.connect();
+      }
     } catch (err) {
       setError("Failed to connect to server");
       setIsCreating(false);

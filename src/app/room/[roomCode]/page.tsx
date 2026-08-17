@@ -22,25 +22,33 @@ export default function RoomPage() {
   useEffect(() => {
     const socket = getSocket();
 
-    if (!socket.connected) {
+    const doEmit = () => {
+      socket.emit(
+        "join_room",
+        { roomCode },
+        (result) => {
+          if (result.success) {
+            setMyPlayerId(socket.id ?? null);
+            setIsLoading(false);
+          } else {
+            setError(result.error || "Failed to join room");
+            setIsLoading(false);
+          }
+        }
+      );
+    };
+
+    if (socket.connected) {
+      setMyPlayerId(socket.id ?? null);
+      doEmit();
+    } else {
+      socket.once("connect", doEmit);
+      socket.once("connect_error", (err) => {
+        setError("Failed to connect to server: " + err.message);
+        setIsLoading(false);
+      });
       socket.connect();
     }
-
-    setMyPlayerId(socket.id ?? null);
-
-    socket.emit(
-      "join_room",
-      { roomCode },
-      (result) => {
-        if (result.success) {
-          setMyPlayerId(socket.id ?? null);
-          setIsLoading(false);
-        } else {
-          setError(result.error || "Failed to join room");
-          setIsLoading(false);
-        }
-      }
-    );
 
     const onPlayerJoined = (data: { players: Player[] }) => {
       setPlayers(data.players);
