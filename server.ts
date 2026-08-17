@@ -7,7 +7,12 @@ import { closeDb } from "./src/server/persistence/sqlite";
 
 const PORT = parseInt(process.env.WS_PORT || "3001");
 
-const httpServer = createServer();
+const httpServer = createServer((req, res) => {
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("ok");
+  }
+});
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, {}, SocketData>(
   httpServer,

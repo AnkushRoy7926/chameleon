@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: chameleon-ws
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npx tsx server.ts
+    envVars:
+      - key: WS_PORT
+        value: 3001
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+    healthCheckPath: /
