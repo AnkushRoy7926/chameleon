@@ -460,6 +460,7 @@ describe("Chameleon Rules", () => {
     isFirstVotingRound: true,
     round: 1,
     clueRound: 1,
+    roundStartClueCount: 0,
     chameleonId: "player-0",
     category: "Test",
     answer: "Answer",

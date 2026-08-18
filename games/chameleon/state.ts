@@ -27,6 +27,7 @@ export interface ChameleonGameState {
   round: number;
   clueRound: number;
   isFirstVotingRound: boolean;
+  roundStartClueCount: number;
   chameleonId: string;
   category: string;
   answer: string;
@@ -50,6 +51,7 @@ export function createInitialChameleonState(
     round: 1,
     clueRound: 1,
     isFirstVotingRound: true,
+    roundStartClueCount: 0,
     chameleonId: "",
     category: "",
     answer: "",

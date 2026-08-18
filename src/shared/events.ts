@@ -3,6 +3,7 @@ import type { Player, Room, GameAction } from "./types";
 export interface ServerToClientEvents {
   session_restored: (data: { room: Room; gameState: unknown }) => void;
   session_expired: () => void;
+  reconnect_success: (data: { playerId: string; token: string }) => void;
 
   room_created: (data: { room: Room }) => void;
   player_joined: (data: { players: Player[] }) => void;
@@ -31,13 +32,15 @@ export interface ClientToServerEvents {
     callback: (result: {
       success: boolean;
       roomCode?: string;
+      playerId?: string;
+      token?: string;
       error?: string;
     }) => void
   ) => void;
 
   join_room: (
     data: { roomCode: string },
-    callback: (result: { success: boolean; error?: string }) => void
+    callback: (result: { success: boolean; playerId?: string; token?: string; error?: string }) => void
   ) => void;
 
   leave_room: () => void;

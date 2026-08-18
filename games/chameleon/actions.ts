@@ -79,7 +79,8 @@ function handleSubmitClue(
   }
 
   const phaseMaxClues = state.phase === "CLUE_PHASE_1" ? 1 : 2;
-  const playerClueCount = state.clues.filter(
+  const currentRoundClues = state.clues.slice(state.roundStartClueCount);
+  const playerClueCount = currentRoundClues.filter(
     (c) => c.playerId === playerId
   ).length;
 
@@ -112,10 +113,7 @@ function getCurrentCluePlayerId(state: ChameleonGameState): string | undefined {
     return undefined;
   }
 
-  const phaseClueCount =
-    state.phase === "CLUE_PHASE_1"
-      ? state.clues.length
-      : state.clues.length - state.players.length;
+  const phaseClueCount = state.clues.length - state.roundStartClueCount;
 
   return alivePlayers[phaseClueCount % alivePlayers.length]?.id;
 }

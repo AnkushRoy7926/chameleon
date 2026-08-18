@@ -9,6 +9,8 @@ type PartialChameleonState = Partial<ChameleonGameState> & {
 };
 
 export function getPhaseEndCondition(state: ChameleonGameState): boolean {
+  const roundClues = state.clues.length - state.roundStartClueCount;
+
   switch (state.phase) {
     case "LOBBY":
       return false;
@@ -17,9 +19,9 @@ export function getPhaseEndCondition(state: ChameleonGameState): boolean {
     case "CATEGORY_REVEAL":
       return true;
     case "CLUE_PHASE_1":
-      return state.clues.length >= state.players.length;
+      return roundClues >= state.players.length;
     case "CLUE_PHASE_2":
-      return state.clues.length >= state.players.length * 2;
+      return roundClues >= state.players.length * 2;
     case "DISCUSSION":
       return true;
     case "VOTING":

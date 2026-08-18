@@ -97,11 +97,11 @@ export function advancePhase(state: ChameleonGameState): ChameleonGameState {
   if (nextPhase === "CLUE_PHASE_1" && state.phase === "VOTE_RESULT") {
     newState = {
       ...newState,
-      clues: [],
       votes: {},
       isFirstVotingRound: false,
       round: state.round + 1,
       clueRound: 1,
+      roundStartClueCount: state.clues.length,
       playerDeductions: {},
     };
   }

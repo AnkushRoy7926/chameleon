@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSocket } from "@/lib/socket-client";
+import { getSocket, saveSession } from "@/lib/socket-client";
 
 export default function JoinRoomPage() {
   const router = useRouter();
@@ -24,7 +24,8 @@ export default function JoinRoomPage() {
 
       const doEmit = () => {
         socket.emit("join_room", { roomCode: roomCode.toUpperCase() }, (result) => {
-          if (result.success) {
+          if (result.success && result.playerId && result.token) {
+            saveSession(roomCode.toUpperCase(), result.playerId, result.token);
             router.push(`/room/${roomCode.toUpperCase()}`);
           } else {
             setError(result.error || "Failed to join room");

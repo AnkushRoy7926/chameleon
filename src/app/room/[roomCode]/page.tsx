@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getSocket } from "@/lib/socket-client";
+import { getSocket, useSocket, loadSession, saveSession } from "@/lib/socket-client";
 import type { Player, Room } from "@shared/types";
-import { useSocket } from "@/lib/socket-client";
+
+function getPlayerPfp(name: string): string | null {
+  const slug = name.toLowerCase().replace(/\s+/g, " ").trim();
+  return `/venerables/${slug}.jpg`;
+}
 
 export default function RoomPage() {
   const params = useParams();
@@ -21,14 +25,16 @@ export default function RoomPage() {
 
   useEffect(() => {
     const socket = getSocket();
+    const session = loadSession();
 
-    const doEmit = () => {
+    const doJoin = () => {
       socket.emit(
         "join_room",
         { roomCode },
         (result) => {
-          if (result.success) {
-            setMyPlayerId(socket.id ?? null);
+          if (result.success && result.playerId && result.token) {
+            saveSession(roomCode, result.playerId, result.token);
+            setMyPlayerId(result.playerId);
             setIsLoading(false);
           } else {
             setError(result.error || "Failed to join room");
@@ -38,17 +44,40 @@ export default function RoomPage() {
       );
     };
 
+    const doReconnect = () => {
+      socket.emit("reconnect", {
+        roomCode: session!.roomCode,
+        playerId: session!.playerId,
+        token: session!.token,
+      });
+    };
+
+    const onConnect = () => {
+      if (session && session.roomCode === roomCode) {
+        doReconnect();
+      } else {
+        doJoin();
+      }
+    };
+
+    const onSessionRestored = (data: { room: Room; gameState: unknown }) => {
+      setPlayers(data.room.players);
+      setMyPlayerId(session?.playerId ?? null);
+      setIsLoading(false);
+    };
+
     if (socket.connected) {
-      setMyPlayerId(socket.id ?? null);
-      doEmit();
+      onConnect();
     } else {
-      socket.once("connect", doEmit);
+      socket.once("connect", onConnect);
       socket.once("connect_error", (err) => {
         setError("Failed to connect to server: " + err.message);
         setIsLoading(false);
       });
       socket.connect();
     }
+
+    socket.on("session_restored", onSessionRestored);
 
     const onPlayerJoined = (data: { players: Player[] }) => {
       setPlayers(data.players);
@@ -73,6 +102,7 @@ export default function RoomPage() {
     socket.on("game_started", onGameStarted);
 
     return () => {
+      socket.off("session_restored", onSessionRestored);
       socket.off("player_joined", onPlayerJoined);
       socket.off("player_left", onPlayerLeft);
       socket.off("game_started", onGameStarted);
@@ -181,7 +211,21 @@ export default function RoomPage() {
                 className="flex items-center justify-between p-3 bg-surface-light rounded-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                  {getPlayerPfp(player.name) ? (
+                    <img
+                      src={getPlayerPfp(player.name)!}
+                      alt={player.name}
+                      className="w-10 h-10 rounded-full"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const fallback = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className={`w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold ${getPlayerPfp(player.name) ? 'hidden' : ''}`}
+                  >
                     {player.name.charAt(0)}
                   </div>
                   <div>

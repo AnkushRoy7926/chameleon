@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import type { GameState } from "./types";
-import { getPlayerName, getPlayerInitial, isMyClueTurn } from "./types";
+import { getPlayerName, getPlayerInitial, getPlayerPfp, isMyClueTurn } from "./types";
+import { PfpModal } from "./PfpModal";
 
 export function CluesPage({
   gameState,
@@ -13,6 +14,7 @@ export function CluesPage({
 }) {
   const [clueInput, setClueInput] = useState("");
   const [turnBoxDismissed, setTurnBoxDismissed] = useState(false);
+  const [modalPfp, setModalPfp] = useState<{ src: string; alt: string } | null>(null);
   const clues = gameState.allClues || [];
   const isMyTurn = isMyClueTurn(gameState);
   const isCluePhase =
@@ -142,7 +144,7 @@ export function CluesPage({
         <div className="clues-list">
           {clues.map((clue, i) => {
             const name = getPlayerName(gameState.players, clue.playerId);
-            const initial = getPlayerInitial(name);
+            const pfp = getPlayerPfp(name);
             const isEjected = clue.playerId === gameState.ejectedPlayerId;
             return (
               <div
@@ -150,7 +152,11 @@ export function CluesPage({
                 className={`clue-entry ${isEjected ? "clue-entry-ejected" : ""}`}
               >
                 <div className="clue-entry-header">
-                  <div className="clue-avatar">{initial}</div>
+                  {pfp ? (
+                    <img src={pfp} alt={name} className="clue-avatar-pfp" onClick={() => setModalPfp({ src: pfp, alt: name })} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  ) : (
+                    <div className="clue-avatar">{getPlayerInitial(name)}</div>
+                  )}
                   <div className="clue-meta">
                     <span className="clue-player-name">{name}</span>
                     <span className="clue-order">Clue #{clue.order || i + 1}</span>
@@ -161,6 +167,10 @@ export function CluesPage({
             );
           })}
         </div>
+      )}
+
+      {modalPfp && (
+        <PfpModal src={modalPfp.src} alt={modalPfp.alt} onClose={() => setModalPfp(null)} />
       )}
     </>
   );

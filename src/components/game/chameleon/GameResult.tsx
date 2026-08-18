@@ -3,18 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GameState } from "./types";
-import { getPlayerName, getPlayerInitial } from "./types";
+import { getPlayerName, getPlayerInitial, getPlayerPfp } from "./types";
 import { WordDeductionBoard } from "./WordDeductionBoard";
 import { getSocket } from "@/lib/socket-client";
+import { PfpModal } from "./PfpModal";
 
 export function GameResult({ gameState }: { gameState: GameState }) {
   const router = useRouter();
   const [restartError, setRestartError] = useState<string | null>(null);
   const [restarting, setRestarting] = useState(false);
+  const [modalPfp, setModalPfp] = useState<{ src: string; alt: string } | null>(null);
+  const [cluesOpen, setCluesOpen] = useState(false);
 
   const chameleonId = gameState.chameleonId || "";
   const chameleon = getPlayerName(gameState.players, chameleonId);
   const chameleonInitial = getPlayerInitial(chameleon);
+  const chameleonPfp = getPlayerPfp(chameleon);
   const answer = gameState.knownAnswer;
   const guessedAnswer = gameState.chameleonGuess;
   const chameleonWon = gameState.winner === "CHAMELEON";
@@ -82,7 +86,17 @@ export function GameResult({ gameState }: { gameState: GameState }) {
       <div className="book-result-section">
         <h3 className="rules-heading">The Chameleon</h3>
         <div className="book-result-chameleon">
-          <div className="clue-avatar clue-avatar-large">{chameleonInitial}</div>
+          {chameleonPfp ? (
+            <img
+              src={chameleonPfp}
+              alt={chameleon}
+              className="book-result-chameleon-pfp"
+              onClick={() => setModalPfp({ src: chameleonPfp, alt: chameleon })}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          ) : (
+            <div className="clue-avatar clue-avatar-large">{chameleonInitial}</div>
+          )}
           <div className="book-result-chameleon-name">{chameleon}</div>
         </div>
         {guessedAnswer && (
@@ -102,19 +116,40 @@ export function GameResult({ gameState }: { gameState: GameState }) {
 
       <div className="book-result-section">
         <h3 className="rules-heading">All Clues</h3>
-        <div className="clues-list clues-list-compact">
-          {(gameState.allClues || []).map((clue, i) => {
-            const name = getPlayerName(gameState.players, clue.playerId);
-            return (
-              <div key={`${clue.playerId}-${i}`} className="clue-entry clue-entry-compact">
-                <div className="clue-meta">
-                  <span className="clue-player-name">{name}</span>
-                  <span className="clue-order">#{clue.order || i + 1}</span>
-                </div>
-                <div className="clue-text">&ldquo;{clue.clue}&rdquo;</div>
+        <div className="clue-dropdown">
+          <button
+            className="clue-dropdown-toggle"
+            onClick={() => setCluesOpen(!cluesOpen)}
+          >
+            <span className={`clue-dropdown-arrow ${cluesOpen ? "clue-dropdown-arrow-open" : ""}`}>&#9654;</span>
+            {cluesOpen ? "Hide clues" : "Show clues"}
+          </button>
+          {cluesOpen && (
+            <div className="clue-dropdown-body">
+              <div className="clues-list clues-list-compact" style={{ paddingTop: "0.5rem" }}>
+                {(gameState.allClues || []).map((clue, i) => {
+                  const name = getPlayerName(gameState.players, clue.playerId);
+                  const pfp = getPlayerPfp(name);
+                  return (
+                    <div key={`${clue.playerId}-${i}`} className="clue-entry clue-entry-compact">
+                      <div className="clue-entry-header">
+                        {pfp ? (
+                          <img src={pfp} alt={name} className="clue-avatar-pfp" onClick={() => setModalPfp({ src: pfp, alt: name })} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        ) : (
+                          <div className="clue-avatar">{getPlayerInitial(name)}</div>
+                        )}
+                        <div className="clue-meta">
+                          <span className="clue-player-name">{name}</span>
+                          <span className="clue-order">#{clue.order || i + 1}</span>
+                        </div>
+                      </div>
+                      <div className="clue-text">&ldquo;{clue.clue}&rdquo;</div>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -132,6 +167,11 @@ export function GameResult({ gameState }: { gameState: GameState }) {
               : "No vote";
             return (
               <div key={p.id} className="vote-result-entry vote-result-entry-compact">
+                {getPlayerPfp(p.name) ? (
+                  <img src={getPlayerPfp(p.name)!} alt={p.name} className="vote-result-avatar-pfp" onClick={() => setModalPfp({ src: getPlayerPfp(p.name)!, alt: p.name })} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                ) : (
+                  <div className="vote-result-avatar">{getPlayerInitial(p.name)}</div>
+                )}
                 <span className="vote-result-name">{p.name}</span>
                 <span className="vote-result-arrow">&rarr;</span>
                 <span className="vote-result-target">{votedName}</span>
@@ -159,6 +199,10 @@ export function GameResult({ gameState }: { gameState: GameState }) {
           </div>
         </div>
       </div>
+
+      {modalPfp && (
+        <PfpModal src={modalPfp.src} alt={modalPfp.alt} onClose={() => setModalPfp(null)} />
+      )}
     </div>
   );
 }

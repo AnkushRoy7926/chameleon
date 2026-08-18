@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import type { GameState } from "./types";
-import { getPlayerName, getPlayerInitial } from "./types";
+import { getPlayerName, getPlayerInitial, getPlayerPfp } from "./types";
+import { PfpModal } from "./PfpModal";
 
 const SKIP_VOTE = "skip";
 
@@ -12,6 +14,7 @@ export function VotingPanel({
   gameState: GameState;
   onAction: (action: { type: string; payload: Record<string, unknown> }) => void;
 }) {
+  const [modalPfp, setModalPfp] = useState<{ src: string; alt: string } | null>(null);
   const hasVoted = gameState.hasVoted;
   const myVote = hasVoted ? gameState.votedFor : undefined;
   const didSkip = myVote === SKIP_VOTE;
@@ -61,7 +64,11 @@ export function VotingPanel({
               disabled={hasVoted && !isCurrentVote}
               className={`vote-btn ${isCurrentVote ? "vote-btn-selected" : ""}`}
             >
-              <div className="clue-avatar">{getPlayerInitial(p.name)}</div>
+              {getPlayerPfp(p.name) ? (
+                <img src={getPlayerPfp(p.name)!} alt={p.name} className="clue-avatar-pfp" onClick={(e) => { e.stopPropagation(); setModalPfp({ src: getPlayerPfp(p.name)!, alt: p.name }); }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              ) : (
+                <div className="clue-avatar">{getPlayerInitial(p.name)}</div>
+              )}
               <div className="vote-btn-info">
                 <span className="vote-btn-name">{p.name}</span>
                 <span className="vote-btn-count">
@@ -95,6 +102,10 @@ export function VotingPanel({
       <div className="book-divider-thin" />
 
       <div className="book-page-number">p. {hasVoted ? 14 : 13}</div>
+
+      {modalPfp && (
+        <PfpModal src={modalPfp.src} alt={modalPfp.alt} onClose={() => setModalPfp(null)} />
+      )}
     </>
   );
 }

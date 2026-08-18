@@ -43,7 +43,7 @@ export function setupSocketHandlers(io: GameServer): void {
         const token = await createReconnectionToken(room.code, playerId);
 
         socket.emit("room_created", { room });
-        callback({ success: true, roomCode: room.code });
+        callback({ success: true, roomCode: room.code, playerId, token });
       } catch (error) {
         console.error("Create room error:", error);
         callback({ success: false, error: "Failed to create room" });
@@ -77,7 +77,7 @@ export function setupSocketHandlers(io: GameServer): void {
           io.to(roomCode).emit("player_joined", { players: room.players });
         }
 
-        callback({ success: true });
+        callback({ success: true, playerId, token });
       } catch (error) {
         console.error("[Server] Join room error:", error);
         callback({ success: false, error: "Failed to join room" });
@@ -107,39 +107,56 @@ export function setupSocketHandlers(io: GameServer): void {
 
     socket.on("reconnect", async (data) => {
       try {
-        const { roomCode, playerId, token } = data;
+        const { roomCode, playerId: oldPlayerId, token } = data;
+        const newPlayerId = socket.id;
 
-        const isValid = await validateReconnectionToken(playerId, token);
+        const isValid = await validateReconnectionToken(oldPlayerId, token);
         if (!isValid) {
           socket.emit("session_expired");
           return;
         }
 
-        cancelDisconnect(playerId);
+        cancelDisconnect(oldPlayerId);
 
-        socket.data.playerId = playerId;
+        socket.data.playerId = newPlayerId;
         socket.data.roomCode = roomCode;
 
         socket.join(roomCode);
 
         const room = await getRoom(roomCode);
         if (room) {
-          const player = room.players.find((p) => p.id === playerId);
+          const player = room.players.find((p) => p.id === oldPlayerId);
           if (player) {
+            player.id = newPlayerId;
             player.isConnected = true;
-            await saveRoom(room);
           }
+
+          if (room.hostId === oldPlayerId) {
+            room.hostId = newPlayerId;
+          }
+
+          await saveRoom(room);
 
           const gameState = await getGameState(roomCode);
           if (gameState) {
             schedulePhaseAdvance(io, roomCode, gameState);
           }
+
+          const game = getGame(room.gameId);
+          const playerView = game && gameState
+            ? game.getPlayerView(gameState, newPlayerId)
+            : gameState;
+
+          const token2 = await createReconnectionToken(roomCode, newPlayerId);
+
           socket.emit("session_restored", {
             room,
-            gameState: gameState || null,
+            gameState: playerView || null,
           });
 
-          io.to(roomCode).emit("player_reconnected", { playerId });
+          socket.emit("reconnect_success", { playerId: newPlayerId, token: token2 });
+
+          io.to(roomCode).emit("player_reconnected", { playerId: newPlayerId });
         }
       } catch (error) {
         console.error("Reconnect error:", error);

@@ -68,6 +68,12 @@ export function getPlayerInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
+export function getPlayerPfp(name: string): string | null {
+  if (name === "You") return null;
+  const slug = name.toLowerCase().replace(/\s+/g, " ").trim();
+  return `/venerables/${slug}.jpg`;
+}
+
 export function isMyClueTurn(gameState: GameState): boolean {
   const phase = gameState.phase;
   if (phase !== "CLUE_PHASE_1" && phase !== "CLUE_PHASE_2") return false;

@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { GameState, ChatMessage } from "./types";
-import { getPlayerInitial, isMyClueTurn } from "./types";
+import { getPlayerInitial, getPlayerPfp, isMyClueTurn } from "./types";
+import { PfpModal } from "./PfpModal";
 
 export function ChatPage({
   gameState,
@@ -18,6 +19,7 @@ export function ChatPage({
   const [input, setInput] = useState("");
   const [clueInput, setClueInput] = useState("");
   const [clueBoxDismissed, setClueBoxDismissed] = useState(false);
+  const [modalPfp, setModalPfp] = useState<{ src: string; alt: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -160,9 +162,13 @@ export function ChatPage({
             ) : (
               <>
                 <div className="chat-msg-header">
-                  <div className="chat-msg-avatar">
-                    {getPlayerInitial(msg.playerName)}
-                  </div>
+                  {getPlayerPfp(msg.playerName) ? (
+                    <img src={getPlayerPfp(msg.playerName)!} alt={msg.playerName} className="chat-msg-avatar-pfp" onClick={() => setModalPfp({ src: getPlayerPfp(msg.playerName)!, alt: msg.playerName })} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  ) : (
+                    <div className="chat-msg-avatar">
+                      {getPlayerInitial(msg.playerName)}
+                    </div>
+                  )}
                   <span className="chat-msg-name">{msg.playerName}</span>
                   <span className="chat-msg-time">
                     {new Date(msg.timestamp).toLocaleTimeString([], {
@@ -198,6 +204,10 @@ export function ChatPage({
           SEND
         </button>
       </div>
+
+      {modalPfp && (
+        <PfpModal src={modalPfp.src} alt={modalPfp.alt} onClose={() => setModalPfp(null)} />
+      )}
     </div>
   );
 }

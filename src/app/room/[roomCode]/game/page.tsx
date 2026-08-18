@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
-import { getSocket } from "@/lib/socket-client";
+import { getSocket, loadSession, saveSession, clearSession } from "@/lib/socket-client";
 import { ChameleonJournal } from "@/components/game/chameleon/ChameleonJournal";
 import type { GameState } from "@/components/game/chameleon/types";
 import type { ChatMessage } from "@/components/game/chameleon/types";
@@ -76,6 +76,16 @@ export default function GamePage() {
       }
     };
 
+    const onReconnectSuccess = (data: { playerId: string; token: string }) => {
+      saveSession(roomCode, data.playerId, data.token);
+    };
+
+    const onSessionExpired = () => {
+      clearSession();
+      setError("Session expired. Please rejoin the room.");
+      setIsLoading(false);
+    };
+
     const onChatMessage = (data: {
       id: string;
       playerId: string;
@@ -95,6 +105,8 @@ export default function GamePage() {
     socket.on("game_started", onGameStarted);
     socket.on("game_over", onGameOver);
     socket.on("session_restored", onSessionRestored);
+    socket.on("reconnect_success", onReconnectSuccess);
+    socket.on("session_expired", onSessionExpired);
     socket.on("chat_message", onChatMessage);
     socket.on("error", onSocketError);
 
@@ -104,7 +116,16 @@ export default function GamePage() {
       } else {
         socket.connect();
         socket.once("connect", () => {
-          fetchGameState();
+          const session = loadSession();
+          if (session && session.roomCode === roomCode) {
+            socket.emit("reconnect", {
+              roomCode: session.roomCode,
+              playerId: session.playerId,
+              token: session.token,
+            });
+          } else {
+            fetchGameState();
+          }
         });
       }
     };
@@ -116,6 +137,8 @@ export default function GamePage() {
       socket.off("game_started", onGameStarted);
       socket.off("game_over", onGameOver);
       socket.off("session_restored", onSessionRestored);
+      socket.off("reconnect_success", onReconnectSuccess);
+      socket.off("session_expired", onSessionExpired);
       socket.off("chat_message", onChatMessage);
       socket.off("error", onSocketError);
     };

@@ -74,9 +74,8 @@ export function getPlayerView(
   };
 
   if (state.phase === "CLUE_PHASE_1") {
-    const hasClued = state.clues
-      .slice(0, state.players.length)
-      .some((c) => c.playerId === playerId);
+    const currentRoundClues = state.clues.slice(state.roundStartClueCount);
+    const hasClued = currentRoundClues.some((c) => c.playerId === playerId);
     const clueData = {
       hasClued,
       myClues: state.clues.filter((c) => c.playerId === playerId),
@@ -102,9 +101,8 @@ export function getPlayerView(
   }
 
   if (state.phase === "CLUE_PHASE_2") {
-    const hasClued = state.clues
-      .slice(state.players.length)
-      .some((c) => c.playerId === playerId);
+    const currentRoundClues = state.clues.slice(state.roundStartClueCount);
+    const hasClued = currentRoundClues.filter((c) => c.playerId === playerId).length >= 2;
     const clueData = {
       hasClued,
       myClues: state.clues.filter((c) => c.playerId === playerId),
@@ -202,6 +200,11 @@ export function getPlayerView(
         state.ejectedPlayerId === state.chameleonId,
       possibleAnswers,
       canGuess: isChameleon,
+      allClues: state.clues.map((c, i) => ({
+        playerId: c.playerId,
+        clue: c.clue,
+        order: i + 1,
+      })),
     };
     if (isChameleon) {
       return {
@@ -258,10 +261,7 @@ function getCurrentCluePlayerId(
     return undefined;
   }
 
-  const phaseClueCount =
-    state.phase === "CLUE_PHASE_1"
-      ? state.clues.length
-      : state.clues.length - state.players.length;
+  const phaseClueCount = state.clues.length - state.roundStartClueCount;
 
   const currentPlayer = alivePlayers[phaseClueCount % alivePlayers.length];
   if (!currentPlayer) {

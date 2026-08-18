@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getSocket } from "@/lib/socket-client";
+import { getSocket, saveSession } from "@/lib/socket-client";
 
 interface GameInfo {
   id: string;
@@ -49,7 +49,8 @@ export default function CreateRoomPage() {
           "create_room",
           { gameId: selectedGame },
           (result) => {
-            if (result.success && result.roomCode) {
+            if (result.success && result.roomCode && result.playerId && result.token) {
+              saveSession(result.roomCode, result.playerId, result.token);
               router.push(`/room/${result.roomCode}`);
             } else {
               setError(result.error || "Failed to create room");

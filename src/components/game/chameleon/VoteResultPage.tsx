@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { GameState } from "./types";
-import { getPlayerName, getPlayerInitial } from "./types";
+import { getPlayerName, getPlayerInitial, getPlayerPfp } from "./types";
+import { PfpModal } from "./PfpModal";
 
 export function VoteResultPage({ gameState }: { gameState: GameState }) {
+  const [modalPfp, setModalPfp] = useState<{ src: string; alt: string } | null>(null);
   const wasDraw = !gameState.ejectedPlayerId;
   const ejectedPlayerId = gameState.ejectedPlayerId || "";
   const ejectedName = wasDraw
@@ -75,9 +78,13 @@ export function VoteResultPage({ gameState }: { gameState: GameState }) {
               className={`vote-result-entry ${isEjected ? "vote-result-entry-ejected" : ""}`}
             >
               <div className="vote-result-header">
-                <div className="vote-result-avatar">
-                  {getPlayerInitial(p.name)}
-                </div>
+                {getPlayerPfp(p.name) ? (
+                  <img src={getPlayerPfp(p.name)!} alt={p.name} className="vote-result-avatar-pfp" onClick={() => setModalPfp({ src: getPlayerPfp(p.name)!, alt: p.name })} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                ) : (
+                  <div className="vote-result-avatar">
+                    {getPlayerInitial(p.name)}
+                  </div>
+                )}
                 <span className="vote-result-name">{p.name}</span>
                 <span className="vote-result-count">{count} vote{count !== 1 ? "s" : ""}</span>
               </div>
@@ -90,6 +97,10 @@ export function VoteResultPage({ gameState }: { gameState: GameState }) {
           );
         })}
       </div>
+
+      {modalPfp && (
+        <PfpModal src={modalPfp.src} alt={modalPfp.alt} onClose={() => setModalPfp(null)} />
+      )}
     </>
   );
 }

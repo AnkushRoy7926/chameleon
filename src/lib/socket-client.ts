@@ -8,6 +8,32 @@ type GameSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 let socket: GameSocket | null = null;
 
+const SESSION_KEY = "chameleon_session";
+
+interface StoredSession {
+  roomCode: string;
+  playerId: string;
+  token: string;
+}
+
+export function saveSession(roomCode: string, playerId: string, token: string) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ roomCode, playerId, token }));
+}
+
+export function loadSession(): StoredSession | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
 export function getSocket(): GameSocket {
   if (typeof window === "undefined") return null!;
   if (!socket) {
